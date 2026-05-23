@@ -32,7 +32,11 @@ import java.util.zip.ZipInputStream;
 @ApiStatus.Internal
 public class Rapier3D {
 
-    private static final String NATIVE_DIR = ".sable/natives";
+    private static final Path NATIVE_DIR = Paths.get(
+            System.getProperty("user.home", System.getProperty("user.dir")),
+            ".sable",
+            "natives"
+    );
     private static final String LIB_NAME = "sable_rapier";
 
     public static final String NATIVE_NAME = getNativeName();
@@ -71,7 +75,7 @@ public class Rapier3D {
                 throw new FileNotFoundException("sable_rapier_binaries.zip.l4z");
             }
 
-            final Path dir = Paths.get(NATIVE_DIR);
+            final Path dir = NATIVE_DIR;
             if (!Files.exists(dir)) {
                 Files.createDirectories(dir);
             }
@@ -87,6 +91,7 @@ public class Rapier3D {
                             Files.createFile(tempFile);
                         }
                         Files.copy(ti, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                        Sable.LOGGER.info("Loading Rapier native from {}", tempFile.toAbsolutePath());
                         System.load(tempFile.toAbsolutePath().toString());
                         return;
                     }
