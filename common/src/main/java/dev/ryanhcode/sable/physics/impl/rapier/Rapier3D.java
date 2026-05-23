@@ -19,6 +19,7 @@ import org.joml.Vector3dc;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ import java.util.zip.ZipInputStream;
 @ApiStatus.Internal
 public class Rapier3D {
 
-    private static final String NATIVE_DIR = ".sable/natives";
+    private static final Path NATIVE_DIR = resolveNativeDir();
     private static final String LIB_NAME = "sable_rapier";
 
     public static final String NATIVE_NAME = getNativeName();
@@ -42,6 +43,32 @@ public class Rapier3D {
 
     static {
         loadLibrary();
+    }
+
+    private static Path resolveNativeDir() {
+        // Trying to use mod.jar relative path: ../.sable for using natives
+        final Path jarPath = getCodeSourcePath();
+        if (jarPath != null && Files.isRegularFile(jarPath)) {
+            final Path jarRelativeDir = jarPath.getParent().resolve("..").resolve(".sable").resolve("natives")
+                    .normalize();
+            Sable.LOGGER.info("Using jar-relative Rapier native directory {}", jarRelativeDir.toAbsolutePath());
+            return jarRelativeDir;
+        }
+
+        // Using a bit overly generic ~/.sable directory as a fallback
+        final Path fallbackDir = Paths.get(System.getProperty("user.home", System.getProperty("user.dir")), ".sable",
+                "natives");
+        Sable.LOGGER.info("Using fallback Rapier native directory {}", fallbackDir.toAbsolutePath());
+        return fallbackDir;
+    }
+
+    private static Path getCodeSourcePath() {
+        try {
+            return Paths.get(Rapier3D.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (final URISyntaxException | SecurityException e) {
+            Sable.LOGGER.debug("Unable to resolve Rapier code source path, falling back to user home", e);
+            return null;
+        }
     }
 
     private static String getNativeName() {
@@ -59,22 +86,27 @@ public class Rapier3D {
             return LIB_NAME + "_" + arch + "_macos.dylib";
         } else {
             if (os != OS.LINUX) {
-                Sable.LOGGER.error("Unknown platform '{}' detected, sable will attempt to use linux natives, this may or may not work.", System.getProperty("os.name"));
+                Sable.LOGGER.error(
+                        "Unknown platform '{}' detected, sable will attempt to use linux natives, this may or may not work.",
+                        System.getProperty("os.name"));
             }
             return LIB_NAME + "_" + arch + "_linux.so";
         }
     }
 
     private static void loadLibrary() {
-        try (final InputStream is = Rapier3D.class.getResourceAsStream("/natives/" + LIB_NAME + "/sable_rapier_binaries.zip.l4z")) {
+        try (final InputStream is = Rapier3D.class
+                .getResourceAsStream("/natives/" + LIB_NAME + "/sable_rapier_binaries.zip.l4z")) {
             if (is == null) {
                 throw new FileNotFoundException("sable_rapier_binaries.zip.l4z");
             }
 
-            final Path dir = Paths.get(NATIVE_DIR);
+            final Path dir = NATIVE_DIR;
             if (!Files.exists(dir)) {
                 Files.createDirectories(dir);
             }
+
+            Sable.LOGGER.info("Using Rapier native directory {}", dir.toAbsolutePath());
 
             try (final LZ4FrameInputStream is2 = new LZ4FrameInputStream(is);
                  final ZipInputStream ti = new ZipInputStream(is2)) {
