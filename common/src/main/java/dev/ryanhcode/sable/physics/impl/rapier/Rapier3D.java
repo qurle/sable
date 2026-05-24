@@ -6,6 +6,7 @@ import dev.ryanhcode.sable.api.physics.callback.BlockSubLevelCollisionCallback;
 import dev.ryanhcode.sable.api.physics.mass.MassData;
 import dev.ryanhcode.sable.mixinterface.physics.ServerLevelSceneExtension;
 import dev.ryanhcode.sable.physics.impl.rapier.collider.RapierVoxelColliderData;
+import dev.ryanhcode.sable.platform.SableGameDirectoryPlatform;
 import net.jpountz.lz4.LZ4FrameInputStream;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
