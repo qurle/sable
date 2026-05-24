@@ -46,13 +46,13 @@ public class Rapier3D {
     }
 
     private static Path resolveNativeDir() {
-        // Trying to use mod.jar relative path: ../.sable for using natives
-        final Path jarPath = getCodeSourcePath();
-        if (jarPath != null && Files.isRegularFile(jarPath)) {
-            final Path jarRelativeDir = jarPath.getParent().resolve("..").resolve(".sable").resolve("natives")
-                    .normalize();
-            Sable.LOGGER.info("Using jar-relative Rapier native directory {}", jarRelativeDir.toAbsolutePath());
-            return jarRelativeDir;
+        // Trying to get game directory
+        final Path gameDir = SableGameDirectoryPlatform.INSTANCE.getGameDirectory();
+        if (gameDir != null) {
+            final Path gameDirRelativeDir = gameDir.resolve(".sable").resolve("natives").normalize();
+            Sable.LOGGER.info("Using game-dir-relative Rapier native directory {}",
+                    gameDirRelativeDir.toAbsolutePath());
+            return gameDirRelativeDir;
         }
 
         // Using a bit overly generic ~/.sable directory as a fallback
