@@ -6,7 +6,7 @@ import dev.ryanhcode.sable.api.physics.callback.BlockSubLevelCollisionCallback;
 import dev.ryanhcode.sable.api.physics.mass.MassData;
 import dev.ryanhcode.sable.mixinterface.physics.ServerLevelSceneExtension;
 import dev.ryanhcode.sable.physics.impl.rapier.collider.RapierVoxelColliderData;
-import dev.ryanhcode.sable.platform.SableGameDirectoryPlatform;
+import dev.ryanhcode.sable.platform.SableLoaderPlatform;
 import net.jpountz.lz4.LZ4FrameInputStream;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -48,7 +48,7 @@ public class Rapier3D {
 
     private static Path resolveNativeDir() {
         // Trying to get game directory
-        final Path gameDir = SableGameDirectoryPlatform.INSTANCE.getGameDirectory();
+        final Path gameDir = SableLoaderPlatform.INSTANCE.getGameDirectory();
         if (gameDir != null) {
             final Path gameDirRelativeDir = gameDir.resolve(".sable").resolve("natives").normalize();
             Sable.LOGGER.info("Using game-dir-relative Rapier native directory {}",
@@ -134,7 +134,8 @@ public class Rapier3D {
                     Sable.ISSUE_TRACKER_URL,
                     t);
             final CrashReport crashReport = CrashReport.forThrowable(
-                    t instanceof UnsatisfiedLinkError ? t.getCause() : t, "Sable linking with Rapier natives");
+                    t instanceof UnsatisfiedLinkError ? t.getCause() : 
+                    t, "Sable linking with Rapier natives");
             final CrashReportCategory category = crashReport.addCategory("Natives");
             category.setDetail("Name", Rapier3D.NATIVE_NAME);
             throw new ReportedException(crashReport);
