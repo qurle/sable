@@ -1,7 +1,7 @@
 package dev.ryanhcode.sable.neoforge.platform;
 
 import dev.ryanhcode.sable.platform.SableGameDirectoryPlatform;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
