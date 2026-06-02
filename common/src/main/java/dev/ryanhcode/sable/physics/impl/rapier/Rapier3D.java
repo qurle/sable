@@ -20,10 +20,8 @@ import org.joml.Vector3dc;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -47,20 +45,13 @@ public class Rapier3D {
     }
 
     private static Path resolveNativeDir() {
-        // Trying to get game directory
-        final Path gameDir = SableLoaderPlatform.INSTANCE.getGameDirectory();
-        if (gameDir != null) {
-            final Path gameDirRelativeDir = gameDir.resolve(".sable").resolve("natives").normalize();
-            Sable.LOGGER.info("Using game-dir-relative Rapier native directory {}",
-                    gameDirRelativeDir.toAbsolutePath());
-            return gameDirRelativeDir;
+        try {
+                final Path gameDir = SableLoaderPlatform.INSTANCE.getGameDirectory();
+                return gameDir.resolve(".sable").resolve("natives").normalize();
+        } catch (final Exception e) {
+                Sable.LOGGER.error("Unable to resolve path for Rapier natives files", e);
+                return null;
         }
-
-        // Using a bit overly generic ~/.sable directory as a fallback
-        final Path fallbackDir = Paths.get(System.getProperty("user.home", System.getProperty("user.dir")), ".sable",
-                "natives");
-        Sable.LOGGER.info("Using fallback Rapier native directory {}", fallbackDir.toAbsolutePath());
-        return fallbackDir;
     }
 
     private static String getNativeName() {
