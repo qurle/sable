@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -89,8 +90,6 @@ public final class Rapier3D {
                 Files.createDirectories(NATIVE_DIR);
             }
 
-            Sable.LOGGER.info("Using Rapier native directory {}", dir.toAbsolutePath());
-
             try (final LZ4FrameInputStream is2 = new LZ4FrameInputStream(is);
                  final ZipInputStream ti = new ZipInputStream(is2)) {
 
@@ -103,7 +102,6 @@ public final class Rapier3D {
                         }
                         Files.createFile(tempFile);
                         Files.copy(ti, tempFile, StandardCopyOption.REPLACE_EXISTING);
-                        Sable.LOGGER.info("Loading Rapier native from {}", tempFile.toAbsolutePath());
                         System.load(tempFile.toAbsolutePath().toString());
                         return;
                     }
